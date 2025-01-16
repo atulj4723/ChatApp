@@ -1,10 +1,15 @@
 import ChatShow from "./ChatShow.jsx";
-const ChatList = () => {
+
+const ChatList = ({ theme }) => {
     return (
-        <>
-            <ChatShow />
-            <ChatShow /><ChatShow />
-        </>
+        <div className="p-3 grid grid-cols-1 gap-3">
+            {Array(20)
+                .fill(null)
+                .map((_, idx) => (
+                    <ChatShow key={idx} theme={theme} />
+                ))}
+        </div>
     );
 };
+
 export default ChatList;
