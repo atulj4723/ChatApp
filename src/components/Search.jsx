@@ -1,12 +1,19 @@
-import { useState } from "react";
-const Search = ({ setList, data }) => {
+import { useState, useEffect, useContext } from "react";
+import { DataContext } from "../DataContext.jsx";
+const Search = ({ setList }) => {
     const [val, setVal] = useState("");
+    const [keys, setKeys] = useState();
+
+    const { data } = useContext(DataContext);
+    useEffect(() => {
+        const val1 = Object.keys(data);
+        setKeys(val1);
+    }, [data]);
 
     const change = e => {
         const searchValue = e.target.value;
         setVal(searchValue);
         const user = window.localStorage.getItem("user");
-        const keys = Object.keys(data);
 
         const result =
             searchValue.length === 0
@@ -14,6 +21,7 @@ const Search = ({ setList, data }) => {
                 : keys.filter(cur => {
                       return data[cur].username.includes(searchValue);
                   });
+        
         setList(result);
     };
 

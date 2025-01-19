@@ -1,13 +1,13 @@
 import ChatInfo from "./ChatInfo.jsx";
 import MessageList from "./MessageList.jsx";
 import MessageSend from "./MessageSend.jsx";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { DataContext } from "../DataContext.jsx";
 const ChatMessages = ({ theme }) => {
     const receiver = window.localStorage.getItem("receiver");
 
     const { data, setData } = useContext(DataContext);
-  
+    const [btn, setBtn] = useState(false);
     return (
         <div
             className={`flex flex-col justify-center h-[100vh] ${
@@ -17,8 +17,8 @@ const ChatMessages = ({ theme }) => {
             }`}
         >
             <ChatInfo theme={theme} data={data[receiver]} />
-            <MessageList theme={theme} />
-            <MessageSend theme={theme} />
+            <MessageList theme={theme} setBtn={setBtn}/>
+            <MessageSend theme={theme} btn={btn} />
         </div>
     );
 };

@@ -9,8 +9,9 @@ const ChatList = ({ theme, data, list }) => {
                 </div>
             ) : (
                 list.map(cur => {
-                    return <ChatShow theme={theme} data={data[cur]} />;
+                    return <ChatShow theme={theme} data1={data[cur]} />;
                 })
+              
             )}
         </div>
     );

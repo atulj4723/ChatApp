@@ -10,11 +10,15 @@ import { DataContext } from "./DataContext.jsx";
 import { onValue, ref } from "firebase/database";
 import { db } from "./firebase.js";
 function App() {
-    const { data, setData } = useContext(DataContext);
+    const { data, setData, messages, setMessages } = useContext(DataContext);
     const userRef = ref(db, "users");
+    const messageRef = ref(db, "message");
     useEffect(() => {
         onValue(userRef, snapshot => {
             setData(snapshot.val());
+        });
+        onValue(messageRef, snapshot => {
+            setMessages(snapshot.val());
         });
     }, []);
     const tmp = window.localStorage.getItem("theme") || "light";
