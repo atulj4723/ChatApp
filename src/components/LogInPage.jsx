@@ -1,17 +1,55 @@
-
 import { useNavigate } from "react-router-dom";
-
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.js";
+import { useState } from "react";
 function LogInPage({ theme, setTheme }) {
     const navigate = useNavigate();
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const toggleTheme = () => {
-        if (theme === "dark") {
-            setTheme("light");
-        } else {
-            setTheme("dark");
-        }
-    };
 
+        setTheme((prevTheme) => {
+        const newTheme = prevTheme === "dark" ? "light" : "dark";
+        window.localStorage.setItem("theme", newTheme);
+        return newTheme;
+    });
+       
+    };
+    const handle = () => {
+        signInWithEmailAndPassword(auth, email, password)
+            .then(userCredential => {
+                const user = userCredential.user;
+                window.localStorage.setItem("user",user.uid);
+                toast.success("LogIn Successfull!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce
+                });
+                navigate("/home");
+            })
+            .catch(error => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                toast.error(errorCode.slice(5), {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce
+                });
+            });
+    };
     return (
         <div
             className={`w-[100vw] min-h-[100vh] flex justify-center items-center transition-all ${
@@ -41,6 +79,10 @@ function LogInPage({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
+                    onChange={e => {
+                        setEmail(e.target.value);
+                    }}
+                    value={email}
                 />
                 <input
                     type="password"
@@ -50,11 +92,17 @@ function LogInPage({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
+                    onChange={e => {
+                        setPassword(e.target.value);
+                    }}
+                    value={password}
                 />
 
                 <button
                     className="bg-blue-600 text-white p-3 text-lg font-semibold rounded-lg w-full hover:bg-blue-500 transition-all"
-                    onClick={() => navigate("/home")}
+                    onClick={() => {
+                        handle();
+                    }}
                 >
                     Log In
                 </button>
@@ -85,6 +133,7 @@ function LogInPage({ theme, setTheme }) {
                     </button>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

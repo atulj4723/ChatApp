@@ -1,14 +1,25 @@
 import "./input.css";
 import { Routes, Route } from "react-router-dom";
-import { useState } from "react";
-
+import { useState, useContext, useEffect } from "react";
 import SignUp from "./components/SignUp.jsx";
 import LogInPage from "./components/LogInPage.jsx";
 import HomePage from "./components/HomePage.jsx";
 import ChatMessages from "./components/ChatMessages.jsx";
 import NotPageFound from "./components/NotPageFound.jsx";
+import { DataContext } from "./DataContext.jsx";
+import { onValue, ref } from "firebase/database";
+import { db } from "./firebase.js";
 function App() {
-    const [theme, setTheme] = useState("dark");
+    const { data, setData } = useContext(DataContext);
+    const userRef = ref(db, "users");
+    useEffect(() => {
+        onValue(userRef, snapshot => {
+            setData(snapshot.val());
+        });
+    }, []);
+    const tmp = window.localStorage.getItem("theme") || "light";
+    const [theme, setTheme] = useState(tmp);
+
     return (
         <Routes>
             <Route

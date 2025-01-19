@@ -2,9 +2,10 @@ import Search from "./Search.jsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const NavBar = ({ theme, toggleTheme }) => {
+const NavBar = ({ theme, toggleTheme, userProfile, setList, data }) => {
     const [show, setShow] = useState(false);
     const navigate = useNavigate();
+
     return (
         <div
             className={`p-3 h-auto flex flex-col sticky top-0 z-50 ${
@@ -24,15 +25,17 @@ const NavBar = ({ theme, toggleTheme }) => {
                     } rounded-lg z-40`}
                 >
                     <img
-                        src="./logo192.png"
-                        className="h-20 w-20 rounded-full border-2 border-white"
+                        src={userProfile.profile_picture}
+                        className="h-20 w-20 rounded-full border-2 border-white object-cover"
                         alt="User"
                     />
-                    <h2 className="text-xl font-bold">Name</h2>
-                    <h3 className="text-lg">username</h3>
+                    <h2 className="text-xl font-bold">{userProfile.name}</h2>
+                    <h3 className="text-lg">{userProfile.username}</h3>
 
                     <button
-                        onClick={toggleTheme}
+                        onClick={() => {
+                            toggleTheme();
+                        }}
                         className={`p-2 rounded-full ${
                             theme === "dark"
                                 ? "bg-gray-800 text-gray-300 hover:bg-gray-600"
@@ -44,6 +47,8 @@ const NavBar = ({ theme, toggleTheme }) => {
                     <button
                         className="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg mt-3 hover:bg-blue-200"
                         onClick={() => {
+                            window.localStorage.setItem("user", "");
+                            window.localStorage.setItem("receiver", "");
                             navigate("/");
                         }}
                     >
@@ -73,9 +78,8 @@ const NavBar = ({ theme, toggleTheme }) => {
                 </button>
             </div>
 
-            
             <div className="mt-2">
-                <Search />
+                <Search setList={setList} data={data} />
             </div>
         </div>
     );

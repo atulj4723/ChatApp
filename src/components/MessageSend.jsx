@@ -1,21 +1,80 @@
-import { useRef, useState } from "react";
-
+import { useRef, useState, useContext } from "react";
+import { db } from "../firebase.js";
+import { DataContext } from "../DataContext.jsx";
+import { ref, set, onValue } from "firebase/database";
 const MessageSend = ({ theme }) => {
+    const { data, setdata } = useContext(DataContext);
     const textarea = useRef(null);
     const [val, setVal] = useState("");
-
-    const handleval = (e) => {
+    const receiver = window.localStorage.getItem("receiver");
+    const [msglist, setmsglist] = useState([]);
+    const sender = window.localStorage.getItem("user");
+    const handleval = e => {
         setVal(e.target.value);
         if (textarea.current) {
             textarea.current.style.height = "auto"; // Reset height
-            textarea.current.style.height = textarea.current.scrollHeight + "px"; // Adjust to scrollHeight
+            textarea.current.style.height =
+                textarea.current.scrollHeight + "px"; // Adjust to scrollHeight
         }
     };
+    const handle = () => {
+        const time = new Date();
+        const msg = {
+            sender: sender,
+            receiver: receiver,
+            message: val,
+            isSeen: false,
+            time: JSON.stringify(time)
+        };
 
+        const id = sender < receiver ? sender + receiver : receiver + sender;
+        onValue(ref(db, "message/"), snapShot => {
+            setmsglist(Object.keys(snapShot.val()));
+        });
+        if (!msglist.includes(id)) {
+            set(ref(db, "message/" + id + "/" + time.getTime()), msg)
+                .then(() => {
+                    setVal("");
+                })
+                .catch(err => {
+                    alert(err.code);
+                });
+        } else {
+            let senderlist = JSON.parse(data[sender].friend_list);
+            senderlist.push(receiver);
+            senderlist = [...new Set(senderlist)];
+            let receiverlist = JSON.parse(data[receiver].friend_list);
+            receiverlist.push(sender);
+            receiverlist = [...new Set(receiverlist)];
+            set(ref(db, "users/" + sender), {
+                name: data[sender].name,
+                username: data[sender].username,
+                profile_picture: data[sender].profile_picture,
+                uid: data[sender].uid,
+                friend_list: JSON.stringify(senderlist)
+            });
+            set(ref(db, "users/" + receiver), {
+                name: data[receiver].name,
+                username: data[receiver].username,
+                profile_picture: data[receiver].profile_picture,
+                uid: data[receiver].uid,
+                friend_list: JSON.stringify(receiverlist)
+            });
+            set(ref(db, "message/" + id + "/" + time.getTime()), msg)
+                .then(() => {
+                    setVal("");
+                })
+                .catch(err => {
+                    alert(err.code);
+                });
+        }
+    };
     return (
         <div
-            className={`h-[70px] flex justify-between items-center p-1 fixed bottom-0 w-[100%] ${
-                theme === "dark" ? "bg-gray-800 text-white" : "bg-blue-100 text-black"
+            className={`h-[10vh] flex justify-between items-center p-1 fixed bottom-0 w-[100%] ${
+                theme === "dark"
+                    ? "bg-gray-800 text-white"
+                    : "bg-blue-100 text-black"
             }`}
         >
             <div className="w-[70%] h-[100%] relative">
@@ -38,6 +97,7 @@ const MessageSend = ({ theme }) => {
                         ? "bg-gray-600 text-white hover:bg-gray-500"
                         : "bg-blue-400 text-white hover:bg-blue-500"
                 }`}
+                onClick={handle}
             >
                 Send
             </button>

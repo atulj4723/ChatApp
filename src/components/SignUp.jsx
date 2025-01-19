@@ -1,22 +1,204 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import { DataContext } from "../DataContext.jsx";
+import {
+    uploadBytesResumable,
+    ref as storageRef,
+    getDownloadURL
+} from "firebase/storage";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { set, ref } from "firebase/database";
+import { storage, db, auth } from "../firebase.js";
 
 function SignUp({ theme, setTheme }) {
-    const [imgPath, setimgPath] = useState("");
-   
+    const [imgPath, setImgPath] = useState("");
 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isUnameFocused, setIsUnameFocused] = useState(false);
+    const { data, setData } = useContext(DataContext);
+    const [validUser, setValidUser] = useState(false);
+    const [usernameAlert, setUserNameAlert] = useState(null);
+    const [name, setName] = useState("");
+    const [uname, setUname] = useState("");
+    const [rotate, setRotate] = useState(false);
     const navigate = useNavigate();
 
+    const [tmp, setTmp] = useState("");
+
+    const check = e => {
+         const userList = Object.values(data).map(user => user.username) || [];
+       
+        if (userList.includes(e)) {
+            setValidUser(false);
+            setUserNameAlert("❎ " + e + " is already taken.");
+        } else {
+            setValidUser(true);
+            let l = e.length;
+            if (l > 4) {
+                setUserNameAlert("✅ " + e + " is available.");
+            } else {
+                setUserNameAlert("Username is too short.");
+                setValidUser(false);
+            }
+        }
+    };
+
+    const upload = () => {
+        const file = tmp;
+
+        if (!file) {
+            toast.error("Select Profile Picture", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Bounce
+            });
+            return;
+        }
+
+        try {
+            const fileRef = storageRef(storage, `images/${file.name}`);
+            const uploadTask = uploadBytesResumable(fileRef, file);
+
+            uploadTask.on(
+                "state_changed",
+                snapshot => {
+                    switch (snapshot.state) {
+                        case "paused":
+                            alert("Upload is paused");
+                            break;
+                        case "running":
+                            setRotate(true);
+                            break;
+                    }
+                },
+                error => {
+                    toast.error(error.code.slice(5), {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: Bounce
+                    });
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(
+                        uploadTask.snapshot.ref
+                    );
+                    setRotate(false);
+                    if (validUser) {
+                        if (name != "") {
+                            signin(downloadURL);
+                        } else {
+                            toast.error("Enter Name", {
+                                position: "top-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: false,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                                transition: Bounce
+                            });
+                        }
+                    } else {
+                        toast.error("Enter valid UserName", {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: false,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "colored",
+                            transition: Bounce
+                        });
+                    }
+                }
+            );
+        } catch (error) {
+            toast.error(error.code.slice(5), {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Bounce
+            });
+        }
+    };
     const handleFileChange = e => {
-        setimgPath(URL.createObjectURL(e.target.files[0]));
+        setTmp(e.target.files[0]);
+        setImgPath(URL.createObjectURL(e.target.files[0]));
     };
 
     const toggleTheme = () => {
-        if (theme === "dark") {
-            setTheme("light");
-        } else {
-            setTheme("dark");
-        }
+        setTheme(prevTheme => {
+            const newTheme = prevTheme === "dark" ? "light" : "dark";
+            window.localStorage.setItem("theme", newTheme);
+            return newTheme;
+        });
+    };
+    const signin = downloadURL => {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(userCredential => {
+                // Signed up
+                const user = userCredential.user;
+                const list = JSON.stringify([]);
+                set(ref(db, "users/" + user.uid), {
+                    username: uname,
+                    name: name,
+                    profile_picture: downloadURL,
+                    friend_list: list,
+                    uid: user.uid
+                }).then(() => {
+                    window.localStorage.setItem("user", user.uid);
+                    toast.success("SignUp Successfull!", {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: Bounce
+                    });
+                    navigate("/home");
+                });
+                // ...
+            })
+            .catch(error => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+                toast.error(errorCode.slice(5), {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce
+                });
+            });
     };
 
     return (
@@ -44,7 +226,7 @@ function SignUp({ theme, setTheme }) {
                     {imgPath ? (
                         <img
                             src={imgPath}
-                            alt="user profile"
+                            alt="User profile"
                             className="absolute top-0 left-0 w-full h-full object-cover rounded-full border-2 border-blue-400"
                         />
                     ) : (
@@ -76,6 +258,8 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
+                    onChange={e => setName(e.target.value)}
+                    value={name}
                 />
                 <input
                     type="text"
@@ -84,8 +268,30 @@ function SignUp({ theme, setTheme }) {
                         theme === "dark"
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
-                    }`}
+                    }
+                    ${!validUser ? "focus:ring-red-400 " : ""}
+                    `}
+                    onChange={e => {
+                        setUname(e.target.value);
+                        check(e.target.value);
+                    }}
+                    value={uname}
+                    onFocus={() => setIsUnameFocused(true)}
+                    onBlur={() => {
+                        setUserNameAlert("");
+
+                        setIsUnameFocused(false);
+                    }}
                 />
+                {
+                    <h1
+                        className={`${
+                            !validUser ? "text-red-400 " : "text-green-400"
+                        } ${!isUnameFocused ? "hidden" : ""} `}
+                    >
+                        {usernameAlert}
+                    </h1>
+                }
                 <input
                     type="email"
                     placeholder="Enter Email"
@@ -94,6 +300,9 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
+                    onChange={e => {
+                        setEmail(e.target.value);
+                    }}
                 />
                 <input
                     type="password"
@@ -103,13 +312,25 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
+                    onChange={e => {
+                        setPassword(e.target.value);
+                    }}
                 />
 
                 <button
                     className="bg-blue-600 text-white p-3 text-lg font-semibold rounded-lg w-full hover:bg-blue-500 transition-all"
-                    onClick={() => navigate("/home")}
+                    onClick={() => {
+                        upload();
+                    }}
                 >
-                    Sign Up
+                    {rotate ? (
+                        <div className="flex items-center justify-center animate-pulse ">
+                            Signing Up
+                            <div className="   "> ...</div>
+                        </div>
+                    ) : (
+                        <>Sign Up</>
+                    )}
                 </button>
                 <p className="text-gray-500 text-2xl ">or</p>
                 <button
@@ -118,7 +339,9 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 text-white hover:bg-gray-600"
                             : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     }`}
-                    onClick={() => navigate("/login")}
+                    onClick={() => {
+                        navigate("/login");
+                    }}
                 >
                     Log In
                 </button>
@@ -138,6 +361,7 @@ function SignUp({ theme, setTheme }) {
                     </button>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

@@ -1,10 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 const NotPageFound = () => {
     const navigate = useNavigate();
-
-    return (
+   return (
         <div className="w-[100vw] h-[100vh] bg-gray-900 flex flex-col justify-center items-center text-white">
             {/* Title */}
             <h1 className="text-9xl font-extrabold text-blue-500">404</h1>
@@ -21,15 +19,7 @@ const NotPageFound = () => {
                 Go Back to Home
             </button>
 
-            {/* Illustration (Optional) */}
-            <div className="mt-8">
-                <img
-                    src="https://via.placeholder.com/300x200.png?text=Not+Found"
-                    alt="Not Found Illustration"
-                    className="w-64 h-40 object-contain"
-                />
-            </div>
-        </div>
+                    </div>
     );
 };
 
