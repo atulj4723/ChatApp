@@ -113,7 +113,7 @@ const ChatShow = ({ theme, data1, request }) => {
                 } bg-blue-400 p-1 rounded-xl text-white`}
             >
                 Friend Request
-            </div>):()}
+            </div>):(<></>)}
         </div>
     );
 };
