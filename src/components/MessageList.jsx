@@ -13,9 +13,9 @@ const MessageList = ({ theme, setBtn }) => {
     const [list, setList] = useState([]);
     useEffect(() => {
         if (data && data[sender] && data[receiver]) {
-            setFriend_list(JSON.parse(data[sender].friend_list));
-            setRequest_list(JSON.parse(data[sender].request_list));
-            setList(JSON.parse(data[receiver].request_list));
+            setFriend_list(JSON.parse(data[sender].friend_list||"[]"));
+            setRequest_list(JSON.parse(data[sender].request_list||"[]"));
+            setList(JSON.parse(data[receiver].request_list||"[]") );
         }
     }, [data]);
     const handle1 = () => {
@@ -47,7 +47,7 @@ const MessageList = ({ theme, setBtn }) => {
             request_list: JSON.stringify(list3),
             uid: sender
         });
-        let list2 = JSON.parse(data[receiver].friend_list);
+        let list2 = JSON.parse(data[receiver].friend_list ||"[]");
         list2.unshift(sender);
         list2 = [...new Set(list2)];
         set(ref(db, "users/" + receiver), {

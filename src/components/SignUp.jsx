@@ -28,8 +28,8 @@ function SignUp({ theme, setTheme }) {
     const [tmp, setTmp] = useState("");
 
     const check = e => {
-         const userList = Object.values(data).map(user => user.username) || [];
-       
+        const userList = Object.values(data).map(user => user.username) || [];
+
         if (userList.includes(e)) {
             setValidUser(false);
             setUserNameAlert("❎ " + e + " is already taken.");
@@ -165,7 +165,7 @@ function SignUp({ theme, setTheme }) {
                     name: name,
                     profile_picture: downloadURL,
                     friend_list: list,
-                    request_list:list,
+                    request_list: list,
                     uid: user.uid
                 }).then(() => {
                     window.localStorage.setItem("user", user.uid);

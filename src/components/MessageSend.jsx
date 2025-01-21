@@ -32,10 +32,10 @@ const MessageSend = ({ theme, btn }) => {
             setmsglist(Object.keys(snapShot.val()));
         });
 
-        let senderlist = JSON.parse(data[sender].friend_list);
+        let senderlist = JSON.parse(data[sender].friend_list)||[];
         senderlist.unshift(receiver);
         senderlist = [...new Set(senderlist)];
-        let receiverlist = JSON.parse(data[receiver].friend_list);
+        let receiverlist = JSON.parse(data[receiver].friend_list)||[];
         receiverlist.unshift(sender);
         receiverlist = [...new Set(receiverlist)];
         set(ref(db, "users/" + sender), {

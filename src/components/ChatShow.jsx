@@ -100,20 +100,25 @@ const ChatShow = ({ theme, data1, request }) => {
                     {value}
                 </p>
             </div>
-            <div
-                className={`h-3 w-3 rounded-full ${
-                    theme === "dark" ? "bg-gray-500" : "bg-blue-400"
-                }
+
+            {request ? (
+                <div
+                    className={`${
+                        request ? " scale-100" : " scale-0 "
+                    } bg-blue-400 p-1 rounded-xl text-white`}
+                >
+                    Friend Request
+                </div>
+            ) : (
+               
+                    <div
+                        className={`h-3 w-3 rounded-full ${
+                            theme === "dark" ? "bg-gray-500" : "bg-blue-400"
+                        }
                 ${show ? " opacity-100 scale-100 " : "opacity-0 scale-0"}`}
-            ></div>
-            { request?(
-            <div
-                className={`${
-                    request ? " scale-100" : " scale-0 "
-                } bg-blue-400 p-1 rounded-xl text-white`}
-            >
-                Friend Request
-            </div>):(<></>)}
+                    ></div>
+                
+            )}
         </div>
     );
 };
