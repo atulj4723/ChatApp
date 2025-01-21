@@ -165,6 +165,7 @@ function SignUp({ theme, setTheme }) {
                     name: name,
                     profile_picture: downloadURL,
                     friend_list: list,
+                    request_list:list,
                     uid: user.uid
                 }).then(() => {
                     window.localStorage.setItem("user", user.uid);

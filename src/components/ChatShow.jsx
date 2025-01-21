@@ -2,12 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { DataContext } from "../DataContext.jsx";
 
-const ChatShow = ({ theme, data1 }) => {
+const ChatShow = ({ theme, data1, request }) => {
     const navigate = useNavigate();
     const user = window.localStorage.getItem("user");
     const id = user < data1.uid ? user + data1.uid : data1.uid + user;
     const { messages } = useContext(DataContext);
     useEffect(() => {
+        setValue("");
         if (messages && messages[id]) {
             const msg = messages[id][Object.keys(messages[id]).at(-1)];
             setValue(msg.message);
@@ -66,7 +67,7 @@ const ChatShow = ({ theme, data1 }) => {
     }
     return (
         <div
-            className={`flex items-center p-3 rounded-lg shadow-md h-20 hover:cursor-pointer transition-all ${
+            className={`flex items-center p-3 rounded-lg shadow-md h-20 hover:cursor-pointer origin-top-right transition-all ${
                 theme === "dark"
                     ? "bg-gray-800 hover:bg-gray-700 text-gray-300"
                     : "bg-white hover:bg-blue-100 text-gray-800"
@@ -103,8 +104,16 @@ const ChatShow = ({ theme, data1 }) => {
                 className={`h-3 w-3 rounded-full ${
                     theme === "dark" ? "bg-gray-500" : "bg-blue-400"
                 }
-                ${show ? " opacity-100 " : "opacity-0"}`}
+                ${show ? " opacity-100 scale-100 " : "opacity-0 scale-0"}`}
             ></div>
+            { request?(
+            <div
+                className={`${
+                    request ? " scale-100" : " scale-0 "
+                } bg-blue-400 p-1 rounded-xl text-white`}
+            >
+                Friend Request
+            </div>):()}
         </div>
     );
 };

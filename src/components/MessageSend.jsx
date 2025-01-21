@@ -43,14 +43,15 @@ const MessageSend = ({ theme, btn }) => {
             username: data[sender].username,
             profile_picture: data[sender].profile_picture,
             uid: data[sender].uid,
-            friend_list: JSON.stringify(senderlist)
+            friend_list: JSON.stringify(senderlist),
+            request_list: data[sender].request_list
         });
         set(ref(db, "users/" + receiver), {
             name: data[receiver].name,
             username: data[receiver].username,
             profile_picture: data[receiver].profile_picture,
             uid: data[receiver].uid,
-            friend_list: JSON.stringify(receiverlist)
+            friend_list: JSON.stringify(receiverlist),request_list:data[receiver].request_list
         });
         set(ref(db, "message/" + id + "/" + time.getTime()), msg)
             .then(() => {

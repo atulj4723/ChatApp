@@ -19,7 +19,7 @@ const NavBar = ({ theme, toggleTheme, userProfile, setList, data }) => {
 
                 <div
                     className={`absolute top-[80px] right-5 flex flex-col items-center justify-around w-64 p-5 transition-transform ${
-                        show ? "opacity-100 scale-100" : "opacity-0 scale-95 "
+                        show ? "opacity-100 scale-100" : "opacity-0 scale-0 "
                     } origin-top-right ${
                         theme === "dark" ? "bg-gray-700" : "bg-blue-500"
                     } rounded-lg z-40`}
