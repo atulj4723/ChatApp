@@ -16,7 +16,7 @@ const NavBar = ({ theme, toggleTheme, userProfile, setList, data }) => {
         >
             <div className="flex justify-between items-center">
                 <h1 className="font-extrabold text-3xl">ChatApp</h1>
-                {show ? (
+                {show ? ( //hide or show profile dropdown menu
                     <div
                         className={`absolute top-[80px] right-5 flex flex-col items-center justify-around w-64 p-5 transition-transform 
              origin-top-right ${
@@ -44,14 +44,14 @@ const NavBar = ({ theme, toggleTheme, userProfile, setList, data }) => {
                             }`}
                         >
                             {theme === "dark"
-                                ? "🌙 Dark Mode"
-                                : "☀️ Light Mode"}
+                                ? " ☀️ Light Mode"
+                                : "🌙 Dark Mode"}
                         </button>
                         <button
                             className="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg mt-3 hover:bg-blue-200"
                             onClick={() => {
                                 window.localStorage.setItem("user", "");
-                                window.localStorage.setItem("receiver", "");
+                                window.localStorage.setItem("receiver", ""); //remove all saved data while running application
                                 navigate("/");
                             }}
                         >
@@ -64,8 +64,10 @@ const NavBar = ({ theme, toggleTheme, userProfile, setList, data }) => {
 
                 <button
                     className="p-2 bg-blue-500 rounded-full text-white flex flex-col gap-1 justify-center items-center"
-                    onClick={() => setShow(!show)}
-                >
+                    onClick={() => setShow(!show)} //btn to hide or show profile dropdown menu
+                > {
+                  //hide middle div and rotate the upper and lower div to 45 and -45 deg so it will create X btn
+                }
                     <div
                         className={`transition-transform ${
                             show ? "rotate-45  absolute  " : ""

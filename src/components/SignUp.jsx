@@ -13,30 +13,29 @@ import { storage, db, auth } from "../firebase.js";
 
 function SignUp({ theme, setTheme }) {
     const [imgPath, setImgPath] = useState("");
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isUnameFocused, setIsUnameFocused] = useState(false);
-    const { data, setData } = useContext(DataContext);
+    const { data } = useContext(DataContext);
     const [validUser, setValidUser] = useState(false);
     const [usernameAlert, setUserNameAlert] = useState(null);
     const [name, setName] = useState("");
     const [uname, setUname] = useState("");
-    const [rotate, setRotate] = useState(false);
+    const [isSigning, setSigning] = useState(false);
     const navigate = useNavigate();
-
     const [tmp, setTmp] = useState("");
 
     const check = e => {
         const userList = Object.values(data).map(user => user.username) || [];
-
+        //check does the user entered value present in current user
         if (userList.includes(e)) {
             setValidUser(false);
             setUserNameAlert("❎ " + e + " is already taken.");
         } else {
-            setValidUser(true);
             let l = e.length;
             if (l > 4) {
+                // check user name length
+                setValidUser(true);
                 setUserNameAlert("✅ " + e + " is available.");
             } else {
                 setUserNameAlert("Username is too short.");
@@ -47,8 +46,9 @@ function SignUp({ theme, setTheme }) {
 
     const upload = () => {
         const file = tmp;
-
+        // check user has choosen the profile_picture
         if (!file) {
+            //show pop up msg to choose user profile
             toast.error("Select Profile Picture", {
                 position: "top-right",
                 autoClose: 5000,
@@ -60,26 +60,27 @@ function SignUp({ theme, setTheme }) {
                 theme: "colored",
                 transition: Bounce
             });
-            return;
+            return; // go back if file is not selected
         }
 
         try {
             const fileRef = storageRef(storage, `images/${file.name}`);
-            const uploadTask = uploadBytesResumable(fileRef, file);
+            const uploadTask = uploadBytesResumable(fileRef, file); //Upload file to firebase storage
 
             uploadTask.on(
-                "state_changed",
+                "state_changed", //check current stage of upload task
                 snapshot => {
                     switch (snapshot.state) {
                         case "paused":
                             alert("Upload is paused");
                             break;
                         case "running":
-                            setRotate(true);
+                            setSigning(true); //change signin btn animation
                             break;
                     }
                 },
                 error => {
+                    // display error
                     toast.error(error.code.slice(5), {
                         position: "top-right",
                         autoClose: 5000,
@@ -95,10 +96,11 @@ function SignUp({ theme, setTheme }) {
                 async () => {
                     const downloadURL = await getDownloadURL(
                         uploadTask.snapshot.ref
-                    );
-                    setRotate(false);
+                    ); //get downloadURL of uploaded image
                     if (validUser) {
+                        //check valid username
                         if (name != "") {
+                            //check for valid name
                             signin(downloadURL);
                         } else {
                             toast.error("Enter Name", {
@@ -144,50 +146,49 @@ function SignUp({ theme, setTheme }) {
     };
     const handleFileChange = e => {
         setTmp(e.target.files[0]);
-        setImgPath(URL.createObjectURL(e.target.files[0]));
+        setImgPath(URL.createObjectURL(e.target.files[0])); //create temporary img path to display user
     };
 
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === "dark" ? "light" : "dark";
             window.localStorage.setItem("theme", newTheme);
-            return newTheme;
         });
     };
     const signin = downloadURL => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(userCredential => {
-                // Signed up
+                // Signed up Successfull
+                toast.success("SignUp Successfull!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce
+                });
+                setSigning(false);
                 const user = userCredential.user;
-                const list = JSON.stringify([]);
+
+                // store user datata to db
                 set(ref(db, "users/" + user.uid), {
                     username: uname,
                     name: name,
                     profile_picture: downloadURL,
-                    friend_list: list,
-                    request_list: list,
+                    friend_list: "[]",
+                    request_list: "[]",
                     uid: user.uid
                 }).then(() => {
-                    window.localStorage.setItem("user", user.uid);
-                    toast.success("SignUp Successfull!", {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: false,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: Bounce
-                    });
+                    window.localStorage.setItem("user", user.uid); //save user to local storage
                     navigate("/home");
                 });
-                // ...
             })
             .catch(error => {
                 const errorCode = error.code;
-                const errorMessage = error.message;
-                // ..
+                setSigning(false);
                 toast.error(errorCode.slice(5), {
                     position: "top-right",
                     autoClose: 5000,
@@ -324,7 +325,7 @@ function SignUp({ theme, setTheme }) {
                         upload();
                     }}
                 >
-                    {rotate ? (
+                    {isSigning ? (
                         <div className="flex items-center justify-center animate-pulse ">
                             Signing Up
                             <div className="   "> ...</div>
@@ -358,7 +359,7 @@ function SignUp({ theme, setTheme }) {
                                 : "bg-gray-300 text-gray-800 hover:bg-gray-200"
                         }`}
                     >
-                        {theme === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+                        {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
                     </button>
                 </div>
             </div>

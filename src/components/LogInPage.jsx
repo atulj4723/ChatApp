@@ -4,23 +4,27 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 import { useState } from "react";
 function LogInPage({ theme, setTheme }) {
+    const load_user = window.localStorage.getItem("user");
+
     const navigate = useNavigate();
+    if (load_user != "") {
+        navigate("/home");
+    }
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    // switch theme
     const toggleTheme = () => {
-
-        setTheme((prevTheme) => {
-        const newTheme = prevTheme === "dark" ? "light" : "dark";
-        window.localStorage.setItem("theme", newTheme);
-        return newTheme;
-    });
-       
+        setTheme(prevTheme => {
+            const newTheme = prevTheme === "dark" ? "light" : "dark";
+            window.localStorage.setItem("theme", newTheme);
+        });
     };
     const handle = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then(userCredential => {
                 const user = userCredential.user;
-                window.localStorage.setItem("user",user.uid);
+                window.localStorage.setItem("user", user.uid); //store user id so it can load on home page
+                // if user logged in show notification
                 toast.success("LogIn Successfull!", {
                     position: "top-right",
                     autoClose: 5000,
@@ -32,11 +36,11 @@ function LogInPage({ theme, setTheme }) {
                     theme: "colored",
                     transition: Bounce
                 });
-                navigate("/home");
+                 navigate("/home");
             })
             .catch(error => {
                 const errorCode = error.code;
-                const errorMessage = error.message;
+                //display error while logging in
                 toast.error(errorCode.slice(5), {
                     position: "top-right",
                     autoClose: 5000,
@@ -129,7 +133,7 @@ function LogInPage({ theme, setTheme }) {
                                 : "bg-gray-300 text-gray-800 hover:bg-gray-200"
                         }`}
                     >
-                        {theme === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+                        {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
                     </button>
                 </div>
             </div>

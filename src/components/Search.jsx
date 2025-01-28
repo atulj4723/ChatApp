@@ -7,7 +7,7 @@ const Search = ({ setList }) => {
     const { data } = useContext(DataContext);
     useEffect(() => {
         const val1 = Object.keys(data);
-        setKeys(val1);
+        setKeys(val1); //uid of each user taken
     }, [data]);
 
     const change = e => {
@@ -17,12 +17,12 @@ const Search = ({ setList }) => {
 
         const result =
             searchValue.length === 0
-                ? JSON.parse(data[user].friend_list)
+                ? JSON.parse(data[user].friend_list) // serachValue is empty then it will show user friend_list
                 : keys.filter(cur => {
                       return data[cur].username.includes(searchValue);
-                  });
-        
-        setList(result);
+                  }); //take uid whose username includes serch value
+
+        setList(result);//set uid list to display
     };
 
     return (

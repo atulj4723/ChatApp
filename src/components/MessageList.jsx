@@ -8,20 +8,24 @@ const MessageList = ({ theme, setBtn }) => {
     const { messages, data } = useContext(DataContext);
     const [friend_list, setFriend_list] = useState([]);
     const [request_list, setRequest_list] = useState([]);
+    const [receiverRequestList, setReceiverRequsestList] = useState([]);
     const sender = window.localStorage.getItem("user");
     const receiver = window.localStorage.getItem("receiver");
-    const [list, setList] = useState([]);
+
     useEffect(() => {
         if (data && data[sender] && data[receiver]) {
-            setFriend_list(JSON.parse(data[sender].friend_list||"[]"));
-            setRequest_list(JSON.parse(data[sender].request_list||"[]"));
-            setList(JSON.parse(data[receiver].request_list||"[]") );
+            //set data when sender and receiver data is loaded
+            setFriend_list(JSON.parse(data[sender].friend_list || "[]"));
+            setRequest_list(JSON.parse(data[sender].request_list || "[]"));
+            setReceiverRequsestList(
+                JSON.parse(data[receiver].request_list || "[]")
+            );
         }
     }, [data]);
     const handle1 = () => {
         let list1 = request_list.filter(cur => {
             return cur != receiver;
-        });
+        }); //if friend request is rejected then remove receiver id from request list
         set(ref(db, "users/" + sender), {
             username: data[sender].username,
             name: data[sender].name,
@@ -32,13 +36,13 @@ const MessageList = ({ theme, setBtn }) => {
         });
     };
     const handle2 = () => {
-        setBtn(true);
+        setBtn(true); //send btn activated as friend request accepted
         let list1 = friend_list;
-        list1.unshift(receiver);
+        list1.unshift(receiver); // add receiver id to users friend list
         let list3 = request_list.filter(cur => {
-            return cur != receiver;
+            return cur != receiver; //remove receivers id from request_list
         });
-        list1 = [...new Set(list1)];
+        list1 = [...new Set(list1)]; //make list unique
         set(ref(db, "users/" + sender), {
             username: data[sender].username,
             name: data[sender].name,
@@ -46,9 +50,9 @@ const MessageList = ({ theme, setBtn }) => {
             friend_list: JSON.stringify(list1),
             request_list: JSON.stringify(list3),
             uid: sender
-        });
-        let list2 = JSON.parse(data[receiver].friend_list ||"[]");
-        list2.unshift(sender);
+        }); //set updated list
+        let list2 = JSON.parse(data[receiver].friend_list || "[]");
+        list2.unshift(sender); //similar to user
         list2 = [...new Set(list2)];
         set(ref(db, "users/" + receiver), {
             username: data[receiver].username,
@@ -60,9 +64,9 @@ const MessageList = ({ theme, setBtn }) => {
         });
     };
     const handle = () => {
-        let list1 = list;
+        let list1 = receiverRequestList;
         list1.unshift(sender);
-        list1 = [...new Set(list1)];
+        list1 = [...new Set(list1)]; //send friend request add users id to receivers request_list
         set(ref(db, "users/" + receiver), {
             username: data[receiver].username,
             name: data[receiver].name,
@@ -76,16 +80,17 @@ const MessageList = ({ theme, setBtn }) => {
     const id = sender < receiver ? sender + receiver : receiver + sender;
     useEffect(() => {
         if (last.current) {
-            last.current.scrollIntoView({ behavior: "smooth" });
+            last.current.scrollIntoView({ behavior: "smooth" }); //move to bottom of msglist on update mmsglist
         }
     }, [msglist]);
     useEffect(() => {
         if (messages && messages[id]) {
-            setmsglist(messages[id]);
+            setmsglist(messages[id]); //set msg when messages and users messages are loaded
         }
     }, [messages, id]);
 
-    if (!messages && !data) {
+    if (!messages || !data) {
+        // if data is not loaded
         return (
             <div className="flex justify-center items-center h-[80vh]">
                 <p className="text-gray-500">Loading messages...</p>
@@ -93,7 +98,12 @@ const MessageList = ({ theme, setBtn }) => {
         );
     }
 
-    if (!friend_list.includes(receiver) && !request_list.includes(receiver)) {
+    if (
+        !friend_list.includes(receiver) &&
+        !request_list.includes(receiver) &&
+        !receiverRequestList.includes(sender)
+    ) {
+        //check receiver is present in request_list or friend_list of user or user sent friend request
         return (
             <div
                 className="text-center h-10 w-40 m-auto rounded-xl grid items-center text-white bg-blue-400"
@@ -108,6 +118,7 @@ const MessageList = ({ theme, setBtn }) => {
     }
     if (!friend_list.includes(receiver) && request_list.includes(receiver)) {
         return (
+            //if receiver send a friend request give to option Accept and reject
             <div className=" w-full flex justify-center ">
                 {setBtn(false)}
                 <button
@@ -129,9 +140,22 @@ const MessageList = ({ theme, setBtn }) => {
             </div>
         );
     }
+    if (
+        !friend_list.includes(receiver) &&
+        !request_list.includes(receiver) &&
+        receiverRequestList.includes(sender)
+    ) {
+        //if friend request is sent by user
+        return (
+            <div className="text-center h-10 w-40 m-auto rounded-xl grid items-center text-white bg-green-400">
+                {setBtn(false)}
+                Friend Request Send
+            </div>
+        );
+    }
     return (
         <div
-            className={`flex flex-col gap-1.5 h-[80vh] pt-[70px] overflow-y-scroll ${
+            className={`flex flex-col gap-1.5 h-[80vh] pt-[70px] w-full overflow-y-scroll ${
                 theme === "dark"
                     ? "bg-gray-900 text-white"
                     : "bg-white text-black"

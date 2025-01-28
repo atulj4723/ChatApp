@@ -2,20 +2,20 @@ import { db } from "../firebase.js";
 import { set, ref } from "firebase/database";
 const Message = ({ sender1, seen, theme, msg, receiver, time }) => {
     const user = window.localStorage.getItem("user");
-    let tmp = Date.parse(JSON.parse(time));
+    let tmp = Date.parse(JSON.parse(time)); // date to print time
     const actualTime = new Date(tmp).toLocaleTimeString([], {
         hour: "numeric",
         minute: "numeric",
         hour12: true
-    });
-    const sender=sender1===user;
+    });//convert time into 12 hour format
+    const sender = sender1 === user;
     const id = sender1 < receiver ? sender1 + receiver : receiver + sender1;
     if (receiver == user) {
         let time2 = Date.parse(JSON.parse(time));
         set(ref(db, "message/" + id + "/" + time2), {
             sender: sender1,
             receiver: receiver,
-            isSeen: true,
+            isSeen: true,//set msg is seen
             time: time,
             message: msg
         });

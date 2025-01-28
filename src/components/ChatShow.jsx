@@ -5,21 +5,22 @@ import { DataContext } from "../DataContext.jsx";
 const ChatShow = ({ theme, data1, request }) => {
     const navigate = useNavigate();
     const user = window.localStorage.getItem("user");
-    const id = user < data1.uid ? user + data1.uid : data1.uid + user;
-    const { messages } = useContext(DataContext);
+
+    const id = user < data1.uid ? user + data1.uid : data1.uid + user; //crete id to load last message
+    const { messages, setReceiver } = useContext(DataContext);
     useEffect(() => {
         setValue("");
         if (messages && messages[id]) {
-            const msg = messages[id][Object.keys(messages[id]).at(-1)];
+            const msg = messages[id][Object.keys(messages[id]).at(-1)]; //load last msg
             setValue(msg.message);
-            if (msg.receiver == user && msg.isSeen == false) {
+            if (msg.receiver === user && msg.isSeen === false) {
                 setShow(true);
             }
         }
     }, [messages, id]);
     const [show, setShow] = useState(false);
     const [value, setValue] = useState(" ");
-
+    //if messages data is not loaded so last message is not loaded
     if (!messages) {
         return (
             <div
@@ -29,8 +30,8 @@ const ChatShow = ({ theme, data1, request }) => {
                         : "bg-white hover:bg-blue-100 text-gray-800"
                 }`}
                 onClick={() => {
-                    navigate("/messages");
-                    window.localStorage.setItem("receiver", data1.uid);
+                 
+                    setReceiver(data1.uid);
                 }}
             >
                 <img
@@ -73,8 +74,7 @@ const ChatShow = ({ theme, data1, request }) => {
                     : "bg-white hover:bg-blue-100 text-gray-800"
             }`}
             onClick={() => {
-                navigate("/messages");
-                window.localStorage.setItem("receiver", data1.uid);
+                setReceiver(data1.uid);
             }}
         >
             <img
@@ -110,14 +110,12 @@ const ChatShow = ({ theme, data1, request }) => {
                     Friend Request
                 </div>
             ) : (
-               
-                    <div
-                        className={`h-3 w-3 rounded-full ${
-                            theme === "dark" ? "bg-gray-500" : "bg-blue-400"
-                        }
+                <div
+                    className={`h-3 w-3 rounded-full ${
+                        theme === "dark" ? "bg-gray-500" : "bg-blue-400"
+                    }
                 ${show ? " opacity-100 scale-100 " : "opacity-0 scale-0"}`}
-                    ></div>
-                
+                ></div>
             )}
         </div>
     );

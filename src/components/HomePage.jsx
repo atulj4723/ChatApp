@@ -4,29 +4,32 @@ import ChatList from "./ChatList.jsx";
 import { DataContext } from "../DataContext.jsx";
 import NavBarSkeleton from "./skeleton/NavBarSkeleton.jsx";
 import ChatShowSkeleton from "./skeleton/ChatShowSkeleton.jsx";
-import RequestList from "./RequestList.jsx";
+import { useNavigate } from "react-router-dom";
 const HomePage = ({ setTheme, theme }) => {
     const toggleTheme = () => {
         setTheme(prevTheme => {
             const newTheme = prevTheme === "dark" ? "light" : "dark";
             window.localStorage.setItem("theme", newTheme);
-            return newTheme;
         });
     };
-
+    const navigate = useNavigate();
     const { data } = useContext(DataContext);
     const user = window.localStorage.getItem("user");
+    //if user not present redirect to signup page
+    if (user == "") {
+        navigate("/");
+    }
     const [userProfile, setUserProfile] = useState({});
     const [list, setList] = useState([]);
     const [list1, setList1] = useState([]);
     useEffect(() => {
         if (data && user && data[user]) {
-            setUserProfile(data[user]);
+            setUserProfile(data[user]); //set user profile
             setList(JSON.parse(data[user].friend_list || "[]")); // Parse friend_list safely
-            setList1(JSON.parse(data[user].request_list || "[]"));
+            setList1(JSON.parse(data[user].request_list || "[]")); //parse request_list safely
         }
     }, [data, user]);
-
+    // if user data doesn't present in data or loaded show skeleton
     if (!data[user]) {
         return (
             <div
@@ -52,7 +55,7 @@ const HomePage = ({ setTheme, theme }) => {
                 theme === "dark"
                     ? "bg-gray-800 text-white"
                     : "bg-white text-black"
-            } h-[100vh]`}
+            } h-[100vh] max-w-[650px]`}
         >
             <NavBar
                 theme={theme}
@@ -61,7 +64,9 @@ const HomePage = ({ setTheme, theme }) => {
                 setList={setList}
                 data={data}
             />
-
+            {
+                // to show multiple chats
+            }
             <ChatList theme={theme} list={list} data={data} list1={list1} />
         </div>
     );
