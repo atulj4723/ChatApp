@@ -9,13 +9,13 @@ const ChatMessages = ({ theme }) => {
     const navigate = useNavigate();
     // there is no receiver then it will redirect to homepage
     if (receiver == "") {
-        navigate("/home");
+        navigate("/");
     }
     
     const [btn, setBtn] = useState(false); // according to user friend list set send btn active or deactive
     return (
         <div
-            className={`flex flex-col justify-center h-[100vh] w-full ${
+            className={`flex flex-col flex-1 justify-center relative h-[100vh]  w-full ${
                 theme === "dark"
                     ? "bg-gray-900 text-white"
                     : "bg-white text-black"

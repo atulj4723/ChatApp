@@ -2,12 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { DataContext } from "../DataContext.jsx";
 
-const ChatShow = ({ theme, data1, request }) => {
+const ChatShow = ({ theme, data1, request, active }) => {
     const navigate = useNavigate();
-    const user = window.localStorage.getItem("user");
-
+    const { messages, setReceiver, user } = useContext(DataContext);
     const id = user < data1.uid ? user + data1.uid : data1.uid + user; //crete id to load last message
-    const { messages, setReceiver } = useContext(DataContext);
     useEffect(() => {
         setValue("");
         if (messages && messages[id]) {
@@ -20,6 +18,7 @@ const ChatShow = ({ theme, data1, request }) => {
     }, [messages, id]);
     const [show, setShow] = useState(false);
     const [value, setValue] = useState(" ");
+   
     //if messages data is not loaded so last message is not loaded
     if (!messages) {
         return (
@@ -30,10 +29,12 @@ const ChatShow = ({ theme, data1, request }) => {
                         : "bg-white hover:bg-blue-100 text-gray-800"
                 }`}
                 onClick={() => {
-                 
                     setReceiver(data1.uid);
-                }}
-            >
+                    
+                    if (active) {
+                        navigate("/messages");
+                    }
+                }}>
                 <img
                     src={data1.profile_picture}
                     alt="User Avatar"
@@ -45,15 +46,13 @@ const ChatShow = ({ theme, data1, request }) => {
                     <h2
                         className={`font-bold ${
                             theme === "dark" ? "text-gray-200" : "text-gray-800"
-                        }`}
-                    >
+                        }`}>
                         {data1.username}
                     </h2>
                     <p
                         className={`text-sm truncate ${
                             theme === "dark" ? "text-gray-400" : "text-gray-600"
-                        }`}
-                    >
+                        }`}>
                         lastMsg
                     </p>
                 </div>
@@ -61,8 +60,7 @@ const ChatShow = ({ theme, data1, request }) => {
                     className={`h-3 w-3 rounded-full ${
                         theme === "dark" ? "bg-gray-500" : "bg-blue-400"
                     }
-                ${show ? " opacity-100 " : "opacity-0"}`}
-                ></div>
+                ${show ? " opacity-100 " : "opacity-0"}`}></div>
             </div>
         );
     }
@@ -75,8 +73,10 @@ const ChatShow = ({ theme, data1, request }) => {
             }`}
             onClick={() => {
                 setReceiver(data1.uid);
-            }}
-        >
+                if (active) {
+                    navigate("/messages");
+                }
+            }}>
             <img
                 src={data1.profile_picture}
                 alt="User Avatar"
@@ -88,15 +88,13 @@ const ChatShow = ({ theme, data1, request }) => {
                 <h2
                     className={`font-bold ${
                         theme === "dark" ? "text-gray-200" : "text-gray-800"
-                    }`}
-                >
+                    }`}>
                     {data1.username}
                 </h2>
                 <p
                     className={`text-sm truncate ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
-                    }`}
-                >
+                    }`}>
                     {value}
                 </p>
             </div>
@@ -105,8 +103,7 @@ const ChatShow = ({ theme, data1, request }) => {
                 <div
                     className={`${
                         request ? " scale-100" : " scale-0 "
-                    } bg-blue-400 p-1 rounded-xl text-white`}
-                >
+                    } bg-blue-400 p-1 rounded-xl text-white`}>
                     Friend Request
                 </div>
             ) : (
@@ -114,8 +111,9 @@ const ChatShow = ({ theme, data1, request }) => {
                     className={`h-3 w-3 rounded-full ${
                         theme === "dark" ? "bg-gray-500" : "bg-blue-400"
                     }
-                ${show ? " opacity-100 scale-100 " : "opacity-0 scale-0"}`}
-                ></div>
+                ${
+                    show ? " opacity-100 scale-100 " : "opacity-0 scale-0"
+                }`}></div>
             )}
         </div>
     );

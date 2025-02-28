@@ -5,7 +5,7 @@ import { DataContext } from "../DataContext.jsx";
 import {
     uploadBytesResumable,
     ref as storageRef,
-    getDownloadURL
+    getDownloadURL,
 } from "firebase/storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { set, ref } from "firebase/database";
@@ -25,8 +25,8 @@ function SignUp({ theme, setTheme }) {
     const navigate = useNavigate();
     const [tmp, setTmp] = useState("");
 
-    const check = e => {
-        const userList = Object.values(data).map(user => user.username) || [];
+    const check = (e) => {
+        const userList = Object.values(data).map((user) => user.username) || [];
         //check does the user entered value present in current user
         if (userList.includes(e)) {
             setValidUser(false);
@@ -58,7 +58,7 @@ function SignUp({ theme, setTheme }) {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                transition: Bounce
+                transition: Bounce,
             });
             return; // go back if file is not selected
         }
@@ -69,7 +69,7 @@ function SignUp({ theme, setTheme }) {
 
             uploadTask.on(
                 "state_changed", //check current stage of upload task
-                snapshot => {
+                (snapshot) => {
                     switch (snapshot.state) {
                         case "paused":
                             alert("Upload is paused");
@@ -79,7 +79,7 @@ function SignUp({ theme, setTheme }) {
                             break;
                     }
                 },
-                error => {
+                (error) => {
                     // display error
                     toast.error(error.code.slice(5), {
                         position: "top-right",
@@ -90,7 +90,7 @@ function SignUp({ theme, setTheme }) {
                         draggable: true,
                         progress: undefined,
                         theme: "colored",
-                        transition: Bounce
+                        transition: Bounce,
                     });
                 },
                 async () => {
@@ -112,7 +112,7 @@ function SignUp({ theme, setTheme }) {
                                 draggable: true,
                                 progress: undefined,
                                 theme: "colored",
-                                transition: Bounce
+                                transition: Bounce,
                             });
                         }
                     } else {
@@ -125,7 +125,7 @@ function SignUp({ theme, setTheme }) {
                             draggable: true,
                             progress: undefined,
                             theme: "colored",
-                            transition: Bounce
+                            transition: Bounce,
                         });
                     }
                 }
@@ -140,24 +140,23 @@ function SignUp({ theme, setTheme }) {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                transition: Bounce
+                transition: Bounce,
             });
         }
     };
-    const handleFileChange = e => {
+    const handleFileChange = (e) => {
         setTmp(e.target.files[0]);
         setImgPath(URL.createObjectURL(e.target.files[0])); //create temporary img path to display user
     };
 
     const toggleTheme = () => {
-        setTheme(prevTheme => {
-            const newTheme = prevTheme === "dark" ? "light" : "dark";
-            window.localStorage.setItem("theme", newTheme);
-        });
+        const newTheme = theme === "dark" ? "light" : "dark";
+        setTheme(newTheme);
+        window.localStorage.setItem("theme", newTheme);
     };
-    const signin = downloadURL => {
+    const signin = (downloadURL) => {
         createUserWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
+            .then((userCredential) => {
                 // Signed up Successfull
                 toast.success("SignUp Successfull!", {
                     position: "top-right",
@@ -168,11 +167,10 @@ function SignUp({ theme, setTheme }) {
                     draggable: true,
                     progress: undefined,
                     theme: "colored",
-                    transition: Bounce
+                    transition: Bounce,
                 });
                 setSigning(false);
                 const user = userCredential.user;
-
                 // store user datata to db
                 set(ref(db, "users/" + user.uid), {
                     username: uname,
@@ -180,13 +178,12 @@ function SignUp({ theme, setTheme }) {
                     profile_picture: downloadURL,
                     friend_list: "[]",
                     request_list: "[]",
-                    uid: user.uid
+                    uid: user.uid,
                 }).then(() => {
-                    window.localStorage.setItem("user", user.uid); //save user to local storage
                     navigate("/home");
                 });
             })
-            .catch(error => {
+            .catch((error) => {
                 const errorCode = error.code;
                 setSigning(false);
                 toast.error(errorCode.slice(5), {
@@ -198,7 +195,7 @@ function SignUp({ theme, setTheme }) {
                     draggable: true,
                     progress: undefined,
                     theme: "colored",
-                    transition: Bounce
+                    transition: Bounce,
                 });
             });
     };
@@ -209,8 +206,7 @@ function SignUp({ theme, setTheme }) {
                 theme === "dark"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-800"
-            }`}
-        >
+            }`}>
             <div
                 className={`${
                     theme === "dark"
@@ -218,8 +214,7 @@ function SignUp({ theme, setTheme }) {
                         : "bg-white text-gray-800"
                 } rounded-2xl border-2 ${
                     theme === "dark" ? "border-gray-600" : "border-gray-300"
-                } flex flex-col gap-4 p-6 justify-center items-center shadow-lg w-[90%] max-w-md`}
-            >
+                } flex flex-col gap-4 p-6 justify-center items-center shadow-lg w-[90%] max-w-md`}>
                 <h1 className="text-4xl font-extrabold text-blue-600">
                     ChatApp
                 </h1>
@@ -239,8 +234,7 @@ function SignUp({ theme, setTheme }) {
                                 theme === "dark"
                                     ? "text-gray-300"
                                     : "text-gray-500"
-                            } font-bold`}
-                        >
+                            } font-bold`}>
                             +
                         </div>
                     )}
@@ -260,7 +254,7 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
-                    onChange={e => setName(e.target.value)}
+                    onChange={(e) => setName(e.target.value)}
                     value={name}
                 />
                 <input
@@ -273,7 +267,7 @@ function SignUp({ theme, setTheme }) {
                     }
                     ${!validUser ? "focus:ring-red-400 " : ""}
                     `}
-                    onChange={e => {
+                    onChange={(e) => {
                         setUname(e.target.value);
                         check(e.target.value);
                     }}
@@ -289,8 +283,7 @@ function SignUp({ theme, setTheme }) {
                     <h1
                         className={`${
                             !validUser ? "text-red-400 " : "text-green-400"
-                        } ${!isUnameFocused ? "hidden" : ""} `}
-                    >
+                        } ${!isUnameFocused ? "hidden" : ""} `}>
                         {usernameAlert}
                     </h1>
                 }
@@ -302,7 +295,7 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
-                    onChange={e => {
+                    onChange={(e) => {
                         setEmail(e.target.value);
                     }}
                 />
@@ -314,7 +307,7 @@ function SignUp({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
-                    onChange={e => {
+                    onChange={(e) => {
                         setPassword(e.target.value);
                     }}
                 />
@@ -323,8 +316,7 @@ function SignUp({ theme, setTheme }) {
                     className="bg-blue-600 text-white p-3 text-lg font-semibold rounded-lg w-full hover:bg-blue-500 transition-all"
                     onClick={() => {
                         upload();
-                    }}
-                >
+                    }}>
                     {isSigning ? (
                         <div className="flex items-center justify-center animate-pulse ">
                             Signing Up
@@ -343,8 +335,7 @@ function SignUp({ theme, setTheme }) {
                     }`}
                     onClick={() => {
                         navigate("/login");
-                    }}
-                >
+                    }}>
                     Log In
                 </button>
 
@@ -357,8 +348,7 @@ function SignUp({ theme, setTheme }) {
                             theme === "dark"
                                 ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                                 : "bg-gray-300 text-gray-800 hover:bg-gray-200"
-                        }`}
-                    >
+                        }`}>
                         {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
                     </button>
                 </div>

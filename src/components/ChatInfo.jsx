@@ -13,7 +13,7 @@ const ChatInfo = ({ theme, data }) => {
     }
     return (
         <div
-            className={`flex p-1 items-center justify-start h-17 pl-4 gap-4 fixed w-[100%] top-0 ${
+            className={`flex p-1 items-center justify-start h-[10vh] pl-4 gap-4 absolute w-[100%] top-0 ${
                 theme === "dark"
                     ? "bg-gray-800 text-white"
                     : "bg-blue-200 text-black"

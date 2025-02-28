@@ -5,6 +5,7 @@ export const DataProvider = ({ children }) => {
     const [data, setData] = useState({});
     const [receiver, setReceiver] = useState("");
     const [messages, setMessages] = useState({});
+    const [user, setUser] = useState("");
     return (
         <DataContext.Provider
             value={{
@@ -13,9 +14,10 @@ export const DataProvider = ({ children }) => {
                 messages,
                 setMessages,
                 receiver,
-                setReceiver
-            }}
-        >
+                setReceiver,
+                user,
+                setUser,
+            }}>
             {children}
         </DataContext.Provider>
     );

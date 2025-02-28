@@ -5,20 +5,20 @@ import { DataContext } from "../DataContext.jsx";
 import NavBarSkeleton from "./skeleton/NavBarSkeleton.jsx";
 import ChatShowSkeleton from "./skeleton/ChatShowSkeleton.jsx";
 import { useNavigate } from "react-router-dom";
-const HomePage = ({ setTheme, theme }) => {
+
+const HomePage = ({ setTheme, theme ,active}) => {
     const toggleTheme = () => {
-        setTheme(prevTheme => {
-            const newTheme = prevTheme === "dark" ? "light" : "dark";
+        
+            const newTheme = theme === "dark" ? "light" : "dark";
+            setTheme(newTheme);
             window.localStorage.setItem("theme", newTheme);
-        });
+        
     };
     const navigate = useNavigate();
-    const { data } = useContext(DataContext);
-    const user = window.localStorage.getItem("user");
+    const { data, user } = useContext(DataContext);
+    
     //if user not present redirect to signup page
-    if (user == "") {
-        navigate("/");
-    }
+
     const [userProfile, setUserProfile] = useState({});
     const [list, setList] = useState([]);
     const [list1, setList1] = useState([]);
@@ -35,8 +35,7 @@ const HomePage = ({ setTheme, theme }) => {
             <div
                 className={`${
                     theme === "dark" ? "bg-gray-800 " : "bg-white "
-                } h-[100vh] `}
-            >
+                } h-[100vh] `}>
                 <NavBarSkeleton />
                 <ChatShowSkeleton />
                 <ChatShowSkeleton />
@@ -55,8 +54,7 @@ const HomePage = ({ setTheme, theme }) => {
                 theme === "dark"
                     ? "bg-gray-800 text-white"
                     : "bg-white text-black"
-            } h-[100vh] max-w-[650px]`}
-        >
+            } h-[100vh] flex-1`}>
             <NavBar
                 theme={theme}
                 toggleTheme={toggleTheme}
@@ -67,7 +65,7 @@ const HomePage = ({ setTheme, theme }) => {
             {
                 // to show multiple chats
             }
-            <ChatList theme={theme} list={list} data={data} list1={list1} />
+            <ChatList theme={theme} list={list} data={data} list1={list1} active={active}/>
         </div>
     );
 };

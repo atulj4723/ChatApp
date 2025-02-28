@@ -5,12 +5,11 @@ import { set, ref } from "firebase/database";
 import { db } from "../firebase.js";
 const MessageList = ({ theme, setBtn }) => {
     const last = useRef(null);
-    const { messages, data } = useContext(DataContext);
+    const { messages, data, receiver ,user} = useContext(DataContext);
     const [friend_list, setFriend_list] = useState([]);
     const [request_list, setRequest_list] = useState([]);
     const [receiverRequestList, setReceiverRequsestList] = useState([]);
-    const sender = window.localStorage.getItem("user");
-    const receiver = window.localStorage.getItem("receiver");
+    const sender = user;
 
     useEffect(() => {
         if (data && data[sender] && data[receiver]) {
@@ -23,7 +22,7 @@ const MessageList = ({ theme, setBtn }) => {
         }
     }, [data]);
     const handle1 = () => {
-        let list1 = request_list.filter(cur => {
+        let list1 = request_list.filter((cur) => {
             return cur != receiver;
         }); //if friend request is rejected then remove receiver id from request list
         set(ref(db, "users/" + sender), {
@@ -32,14 +31,14 @@ const MessageList = ({ theme, setBtn }) => {
             profile_picture: data[sender].profile_picture,
             friend_list: data[sender].friend_list,
             request_list: JSON.stringify(list1),
-            uid: sender
+            uid: sender,
         });
     };
     const handle2 = () => {
         setBtn(true); //send btn activated as friend request accepted
         let list1 = friend_list;
         list1.unshift(receiver); // add receiver id to users friend list
-        let list3 = request_list.filter(cur => {
+        let list3 = request_list.filter((cur) => {
             return cur != receiver; //remove receivers id from request_list
         });
         list1 = [...new Set(list1)]; //make list unique
@@ -49,7 +48,7 @@ const MessageList = ({ theme, setBtn }) => {
             profile_picture: data[sender].profile_picture,
             friend_list: JSON.stringify(list1),
             request_list: JSON.stringify(list3),
-            uid: sender
+            uid: sender,
         }); //set updated list
         let list2 = JSON.parse(data[receiver].friend_list || "[]");
         list2.unshift(sender); //similar to user
@@ -60,7 +59,7 @@ const MessageList = ({ theme, setBtn }) => {
             profile_picture: data[receiver].profile_picture,
             friend_list: JSON.stringify(list2),
             request_list: data[receiver].request_list,
-            uid: receiver
+            uid: receiver,
         });
     };
     const handle = () => {
@@ -73,7 +72,7 @@ const MessageList = ({ theme, setBtn }) => {
             profile_picture: data[receiver].profile_picture,
             friend_list: data[receiver].friend_list,
             request_list: JSON.stringify(list1),
-            uid: receiver
+            uid: receiver,
         });
     };
     const [msglist, setmsglist] = useState();
@@ -87,6 +86,9 @@ const MessageList = ({ theme, setBtn }) => {
         if (messages && messages[id]) {
             setmsglist(messages[id]); //set msg when messages and users messages are loaded
         }
+       if(!Object.keys(messages).includes(id)){
+        setmsglist([]);
+       }
     }, [messages, id]);
 
     if (!messages || !data) {
@@ -109,8 +111,7 @@ const MessageList = ({ theme, setBtn }) => {
                 className="text-center h-10 w-40 m-auto rounded-xl grid items-center text-white bg-blue-400"
                 onClick={() => {
                     handle();
-                }}
-            >
+                }}>
                 {setBtn(false)}
                 Send friend request
             </div>
@@ -125,16 +126,14 @@ const MessageList = ({ theme, setBtn }) => {
                     className="text-center h-10 w-40 m-auto rounded-xl grid items-center text-white bg-green-400"
                     onClick={() => {
                         handle2();
-                    }}
-                >
+                    }}>
                     Accept Request
                 </button>
                 <button
                     className="text-center h-10 w-40 m-auto rounded-xl grid items-center text-white bg-red-400"
                     onClick={() => {
                         handle1();
-                    }}
-                >
+                    }}>
                     Reject Request
                 </button>
             </div>
@@ -155,18 +154,18 @@ const MessageList = ({ theme, setBtn }) => {
     }
     return (
         <div
-            className={`flex flex-col gap-1.5 h-[80vh] pt-[70px] w-full overflow-y-scroll ${
+            className={`flex flex-col gap-1.5 h-[80vh] pt-[70px] w-full overflow-y-scroll no-scrollbar ${
                 theme === "dark"
                     ? "bg-gray-900 text-white"
                     : "bg-white text-black"
-            }`}
-        >
+            }`}>
             {setBtn(true)}
             {msglist && Object.keys(msglist).length > 0 ? (
                 Object.entries(msglist).map(([key, message]) => (
                     <Message
                         receiver={message.receiver}
                         sender1={message.sender}
+                        key={key}
                         seen={message.isSeen}
                         msg={message.message}
                         time={message.time}

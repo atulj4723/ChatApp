@@ -4,26 +4,21 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 import { useState } from "react";
 function LogInPage({ theme, setTheme }) {
-    const load_user = window.localStorage.getItem("user");
-
+    
     const navigate = useNavigate();
-    if (load_user != "") {
-        navigate("/home");
-    }
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     // switch theme
     const toggleTheme = () => {
-        setTheme(prevTheme => {
-            const newTheme = prevTheme === "dark" ? "light" : "dark";
+        const newTheme = theme === "dark" ? "light" : "dark";
+            setTheme(newTheme);
             window.localStorage.setItem("theme", newTheme);
-        });
     };
     const handle = () => {
         signInWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
+            .then((userCredential) => {
                 const user = userCredential.user;
-                window.localStorage.setItem("user", user.uid); //store user id so it can load on home page
                 // if user logged in show notification
                 toast.success("LogIn Successfull!", {
                     position: "top-right",
@@ -34,11 +29,11 @@ function LogInPage({ theme, setTheme }) {
                     draggable: true,
                     progress: undefined,
                     theme: "colored",
-                    transition: Bounce
+                    transition: Bounce,
                 });
-                 navigate("/home");
+                navigate("/home"); //redirect to home page  
             })
-            .catch(error => {
+            .catch((error) => {
                 const errorCode = error.code;
                 //display error while logging in
                 toast.error(errorCode.slice(5), {
@@ -50,7 +45,7 @@ function LogInPage({ theme, setTheme }) {
                     draggable: true,
                     progress: undefined,
                     theme: "colored",
-                    transition: Bounce
+                    transition: Bounce,
                 });
             });
     };
@@ -60,8 +55,7 @@ function LogInPage({ theme, setTheme }) {
                 theme === "dark"
                     ? "bg-gray-900 text-white"
                     : "bg-gray-100 text-gray-800"
-            }`}
-        >
+            }`}>
             <div
                 className={`${
                     theme === "dark"
@@ -69,12 +63,10 @@ function LogInPage({ theme, setTheme }) {
                         : "bg-white text-gray-800"
                 } rounded-2xl border-2 ${
                     theme === "dark" ? "border-gray-600" : "border-gray-300"
-                } flex flex-col gap-4 p-6 justify-center items-center shadow-lg w-[90%] max-w-md`}
-            >
+                } flex flex-col gap-4 p-6 justify-center items-center shadow-lg w-[90%] max-w-md`}>
                 <h1 className="text-4xl font-extrabold text-blue-600">
                     ChatApp
                 </h1>
-
                 <input
                     type="email"
                     placeholder="Enter Email"
@@ -83,7 +75,7 @@ function LogInPage({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
-                    onChange={e => {
+                    onChange={(e) => {
                         setEmail(e.target.value);
                     }}
                     value={email}
@@ -96,7 +88,7 @@ function LogInPage({ theme, setTheme }) {
                             ? "bg-gray-700 border-gray-600 placeholder-gray-400 focus:ring-blue-500 text-white"
                             : "bg-gray-100 border-gray-300 placeholder-gray-500 focus:ring-blue-400 text-gray-800"
                     }`}
-                    onChange={e => {
+                    onChange={(e) => {
                         setPassword(e.target.value);
                     }}
                     value={password}
@@ -106,8 +98,7 @@ function LogInPage({ theme, setTheme }) {
                     className="bg-blue-600 text-white p-3 text-lg font-semibold rounded-lg w-full hover:bg-blue-500 transition-all"
                     onClick={() => {
                         handle();
-                    }}
-                >
+                    }}>
                     Log In
                 </button>
                 <p className="text-gray-500 text-2xl ">or</p>
@@ -117,8 +108,7 @@ function LogInPage({ theme, setTheme }) {
                             ? "bg-gray-700 text-white hover:bg-gray-600"
                             : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     }`}
-                    onClick={() => navigate("/")}
-                >
+                    onClick={() => navigate("/")}>
                     Sign Up
                 </button>
 
@@ -131,8 +121,7 @@ function LogInPage({ theme, setTheme }) {
                             theme === "dark"
                                 ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                                 : "bg-gray-300 text-gray-800 hover:bg-gray-200"
-                        }`}
-                    >
+                        }`}>
                         {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
                     </button>
                 </div>

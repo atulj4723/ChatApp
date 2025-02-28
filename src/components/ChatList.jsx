@@ -1,18 +1,20 @@
 import ChatShow from "./ChatShow.jsx";
 
-const ChatList = ({ theme, data, list, list1 }) => {
+const ChatList = ({ theme, data, list, list1 ,active}) => {
     return (
         // map all Friends request on top
-        <div className="p-3 flex flex-col gap-2 h-[80%] overflow-scroll">
+        <div className="p-3 flex flex-col gap-2 h-[85vh] overflow-scroll no-scrollbar">
             {list1.length === 0 ? (
                 <div></div>
             ) : (
-                list1.map(cur => {
+                list1.map((cur) => {
                     return (
                         <ChatShow
+                            key={cur}
                             theme={theme}
                             data1={data[cur]}
                             request={true}
+                            active={active}
                         />
                     );
                 })
@@ -25,12 +27,14 @@ const ChatList = ({ theme, data, list, list1 }) => {
                         No Friends yet
                     </div>
                 ) : (
-                    list.map(cur => {
+                    list.map((cur) => {
                         return (
                             <ChatShow
+                                key={cur}
                                 theme={theme}
                                 data1={data[cur]}
                                 request={false}
+                                active={active}
                             />
                         );
                     })
