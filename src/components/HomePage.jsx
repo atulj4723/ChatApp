@@ -65,6 +65,7 @@ const HomePage = ({ setTheme, theme ,active}) => {
             {
                 // to show multiple chats
             }
+            
             <ChatList theme={theme} list={list} data={data} list1={list1} active={active}/>
         </div>
     );

@@ -5,7 +5,7 @@ import { set, ref } from "firebase/database";
 import { db } from "../firebase.js";
 const MessageList = ({ theme, setBtn }) => {
     const last = useRef(null);
-    const { messages, data, receiver ,user} = useContext(DataContext);
+    const { messages, data, receiver, user } = useContext(DataContext);
     const [friend_list, setFriend_list] = useState([]);
     const [request_list, setRequest_list] = useState([]);
     const [receiverRequestList, setReceiverRequsestList] = useState([]);
@@ -86,9 +86,9 @@ const MessageList = ({ theme, setBtn }) => {
         if (messages && messages[id]) {
             setmsglist(messages[id]); //set msg when messages and users messages are loaded
         }
-       if(!Object.keys(messages).includes(id)){
-        setmsglist([]);
-       }
+        if (!Object.keys(messages).includes(id)) {
+            setmsglist([]);
+        }
     }, [messages, id]);
 
     if (!messages || !data) {
